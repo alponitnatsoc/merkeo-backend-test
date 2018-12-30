@@ -1,0 +1,16 @@
+products: productos
+name: nombre
+price: precio
+cost: costo
+reference: referencia
+inventory: inventario
+status: estado
+disabled: deshabilitado
+enabled: habilitado
+upload: cargar
+
+form.file.label: Seleccione el archivo CSV.
+form.file.button: Ejecutar
+
+form.file.error.dialog.title: Error al subir el archivo
+form.file.error.dialog.message: Por favor asegurese de que selecciono un archivo csv valido.

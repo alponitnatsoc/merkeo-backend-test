@@ -1,20 +1,71 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello {{ controller_name }}!{% endblock %}
-
+{% block title %}Product Show{% endblock %}
+{% trans_default_domain "messages" %}
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/products.css') }}">
+{% endblock %}
 {% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
-
-<div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
-
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code><a href="{{ 'src/Controller/ProductController.php'|file_link(0) }}">src/Controller/ProductController.php</a></code></li>
-        <li>Your template at <code><a href="{{ 'templates/product/index.html.twig'|file_link(0) }}">templates/product/index.html.twig</a></code></li>
-    </ul>
-</div>
+    <div class="Products-wrapper">
+        <h1>{{ 'products'|trans }}</h1>
+        <table class="table ">
+            <thead class="thead-dark">
+                <tr>
+                    <th scope="row">Id</th>
+                    <th scope="row">{{  'name'|trans }}</th>
+                    <th scope="row">{{  'reference'|trans }}</th>
+                    <th scope="row">{{  'price'|trans }}</th>
+                    <th scope="row">{{  'cost'|trans }}</th>
+                    <th scope="row">{{  'inventory'|trans }}</th>
+                    <th scope="row">{{  'status'|trans }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for product in products %}
+                    <tr>
+                        <td>{{ product.id }}</td>
+                        <td>{{ product.name }}</td>
+                        <td>{{ product.reference }}</td>
+                        <td>${{ product.price|number_format(2,',') }}</td>
+                        <td>${{ product.cost|number_format(2,',') }}</td>
+                        <td>{{ product.inventory }}</td>
+                        <td>{{ product.status == 0 ? 'disabled'|trans : 'enabled'|trans }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="form-wrapper">
+        {{ form_start(form) }}
+        {{ form_row(form.file) }}
+        {{ form_row(form.submit) }}
+        {{ form_end(form) }}
+        <div class="btn btn-primary csv-file-form-upload js_form_file__upload">{{ 'upload'|trans }}</div>
+        <div class="btn btn-primary csv-file-form-submit js_form_file__submit">{{ 'form.file.button'|trans }}</div>
+    </div>
+    <div class="modal" id="file_error_modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog error-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">{{ 'form.file.error.dialog.title'|trans }}</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>{{ 'form.file.error.dialog.message'|trans }}</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <button type="button" class="js_toggle_error_modal" data-toggle="modal" data-target="#file_error_modal">
+    </button>
+    {% block javascripts %}
+        {{ parent() }}
+        <script src="{{ asset('js/product_show.js') }}"></script>
+    {% endblock %}
 {% endblock %}

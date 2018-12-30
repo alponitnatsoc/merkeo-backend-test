@@ -115,6 +115,9 @@ class ProductBundle
             $this->products[] = $product;
         }
 
+        $this->calculateCost();
+        $this->calculatePrice();
+
         return $this;
     }
 
@@ -123,6 +126,37 @@ class ProductBundle
         if ($this->products->contains($product)) {
             $this->products->removeElement($product);
         }
+
+        $this->calculateCost();
+        $this->calculatePrice();
+
+        return $this;
+    }
+
+    public function calculateCost(): self
+    {
+        $totalCost = 0;
+
+        /** @var Product $product */
+        foreach ($this->products as $product){
+            $totalCost += $product->getCost();
+        }
+
+        $this->setCost($totalCost);
+
+        return $this;
+    }
+
+    public function calculatePrice(): self
+    {
+        $totalPrice = 0;
+
+        /** @var Product $product */
+        foreach ($this->products as $product){
+            $totalPrice += $product->getPrice();
+        }
+
+        $this->setPrice($totalPrice);
 
         return $this;
     }

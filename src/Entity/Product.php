@@ -31,22 +31,24 @@ class Product
     /**
      * @ORM\Column(type="float", nullable=true)
      */
-    private $price;
+    private $price = 0.0;
 
     /**
      * @ORM\Column(type="float", nullable=true)
      */
-    private $cost;
+    private $cost = 0.0;
 
     /**
      * @ORM\Column(type="integer")
      */
-    private $inventory;
+    private $inventory = 0;
 
     /**
+     * 0 - inactive
+     * 1 - active
      * @ORM\Column(type="integer")
      */
-    private $status;
+    private $status = 0;
 
     /**
      * @ORM\ManyToMany(targetEntity="App\Entity\ProductBundle", mappedBy="products")
@@ -160,6 +162,24 @@ class Product
             $productBundle->removeProduct($this);
         }
 
+        return $this;
+    }
+
+    /**
+     * @param int $units to increase or decrease inventory
+     * increases the inventory amount in the units passed as parameter, if the units are negative inventory is decreased to a max of 0
+     * @return Product
+     */
+    public function addInventory(int $units) : self
+    {
+        $inventory = $this->inventory+$units >= 0 ? $this->inventory+$units : 0;
+        $this->setInventory($inventory);
+        return $this;
+    }
+
+    public function activateProduct() : self
+    {
+        $this->setStatus(1);
         return $this;
     }
 }

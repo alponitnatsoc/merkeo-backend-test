@@ -1,0 +1,10 @@
+.Products-wrapper { margin: 1rem auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
+.form-wrapper { margin: 4rem auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
+.Products-wrapper code { background: #F5F5F5; padding: 2px 6px; }
+.csv-file-form-upload {background-color: #868686; border-color: #313131; text-transform: uppercase}
+.csv-file-form-upload:hover {background-color: #313131;border-color: #5eb5e0}
+.csv-file-form-submit  {background-color: #868686; border-color: #313131; text-transform: uppercase}
+.csv-file-form-submit:hover {background-color: #313131;border-color: #5eb5e0}
+.form_file_submit {display: none}
+.form-file-wrapper {display: none}
+.js_toggle_error_modal {display: none}
