@@ -26,3 +26,11 @@ luego asegurese de iniciar el servicio de mysql y llamar el comando para crear l
 La url del servidor por defecto es 127.0.0.1:8000 y el path para la funcionalidad de la prueba es product/show
 
 http://127.0.0.1:8000/product/show
+
+Instrucciones para la base de datos
+-----------------------------------
+La estructura utiliza herencia para los grupos de productos por lo tanto la tabla Product tiene una columna para el tipo de producto que se genera automaticamante con las anotaciones ORM si se crea desde symfony, pero para hacerlo manualmente toca utilizar 'product' o 'bunlde_product' 
+
+la tabla bundle_product solo salvara los IDs de los productos que son bundles de la tabla product como manera de busqueda rapida de los bundles y finalmente la relacion se ve en la tabla intermedia product_bundle_product en la que se lista si un product_id pertenece a un bundle_product_id
+
+a manera de prueba puede entrar a la url http://127.0.0.1:8000/product/test para generar un esquema de ejemplo en la base de datos
