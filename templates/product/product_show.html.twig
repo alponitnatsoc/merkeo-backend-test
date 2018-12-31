@@ -13,24 +13,32 @@
             <thead class="thead-dark">
                 <tr>
                     <th scope="row">Id</th>
-                    <th scope="row">{{  'name'|trans }}</th>
-                    <th scope="row">{{  'reference'|trans }}</th>
-                    <th scope="row">{{  'price'|trans }}</th>
-                    <th scope="row">{{  'cost'|trans }}</th>
-                    <th scope="row">{{  'inventory'|trans }}</th>
-                    <th scope="row">{{  'status'|trans }}</th>
+                    <th scope="row">{{ 'name'|trans }}</th>
+                    <th scope="row">{{ 'reference'|trans }}</th>
+                    <th scope="row">{{ 'price'|trans }}</th>
+                    <th scope="row">{{ 'cost'|trans }}</th>
+                    <th scope="row">{{ 'inventory'|trans }}</th>
+                    <th scope="row">{{ 'status'|trans }}</th>
+                    <th scope="row">{{ 'bundle'|trans }}</th>
                 </tr>
             </thead>
             <tbody>
                 {% for product in products %}
                     <tr>
-                        <td>{{ product.id }}</td>
+                        <th>{{ product.id }}</th>
                         <td>{{ product.name }}</td>
                         <td>{{ product.reference }}</td>
                         <td>${{ product.price|number_format(2,',') }}</td>
                         <td>${{ product.cost|number_format(2,',') }}</td>
                         <td>{{ product.inventory }}</td>
                         <td>{{ product.status == 0 ? 'disabled'|trans : 'enabled'|trans }}</td>
+                        <td>
+                            {% if product.class != 'Product' %}
+                                <a class="btn btn-primary" href="{{ path('bundle_show', {'bundleid':product.id}) }}">{{ 'show'|trans }}</a>
+                            {% else %}
+                                {{ '-' }}
+                            {% endif %}
+                        </td>
                     </tr>
                 {% endfor %}
             </tbody>
@@ -41,6 +49,8 @@
         {{ form_row(form.file) }}
         {{ form_row(form.submit) }}
         {{ form_end(form) }}
+        <div class="progress_bar progress js_file_progress_bar"><div id="js_progress_percentage" class="progress" data-progress="0"></div></div>
+        <div class="js_file_uploaded">{{ 'form.file.uploaded'|trans }}</div>
         <div class="btn btn-primary csv-file-form-upload js_form_file__upload">{{ 'upload'|trans }}</div>
         <div class="btn btn-primary csv-file-form-submit js_form_file__submit">{{ 'form.file.button'|trans }}</div>
     </div>

@@ -1,0 +1,58 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ product.name }}{% endblock %}
+{% trans_default_domain "messages" %}
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/products.css') }}">
+{% endblock %}
+{% block body %}
+    <div class="Products-wrapper">
+        <div class="bundle-header col-md-12">
+            <div class="col-md-2 back_btn">
+                <a class="btn btn-primary" href="{{ path('product_show') }}">{{ 'back'|trans }}</a>
+            </div>
+            <div class="col-md-12">
+                <h1>{{ product.name }}</h1>
+            </div>
+        </div>
+
+        <table class="table ">
+            <thead class="thead-dark">
+            <tr>
+                <th scope="row">Id</th>
+                <th scope="row">{{ 'name'|trans }}</th>
+                <th scope="row">{{ 'reference'|trans }}</th>
+                <th scope="row">{{ 'price'|trans }}</th>
+                <th scope="row">{{ 'cost'|trans }}</th>
+                <th scope="row">{{ 'inventory'|trans }}</th>
+                <th scope="row">{{ 'status'|trans }}</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for sproduct in product.products %}
+                <tr>
+                    <th>{{ sproduct.id }}</th>
+                    <td>{{ sproduct.name }}</td>
+                    <td>{{ sproduct.reference }}</td>
+                    <td>${{ sproduct.price|number_format(2,',') }}</td>
+                    <td>${{ sproduct.cost|number_format(2,',') }}</td>
+                    <td>{{ sproduct.inventory }}</td>
+                    <td>{{ sproduct.status == 0 ? 'disabled'|trans : 'enabled'|trans }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+            <thead class="thead-dark">
+            <tr>
+                <th scope="row">{{ product.id }}</th>
+                <th scope="row">{{ product.name }}</th>
+                <th scope="row">{{ product.reference }}</th>
+                <th scope="row">${{ product.price|number_format(2,',') }}</th>
+                <th scope="row">${{ product.cost|number_format(2,',') }}</th>
+                <th scope="row">{{ product.inventory }}</th>
+                <th scope="row">{{ product.status == 0 ? 'disabled'|trans : 'enabled'|trans }}</th>
+            </tr>
+            </thead>
+        </table>
+    </div>
+{% endblock %}

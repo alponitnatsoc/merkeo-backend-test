@@ -10,28 +10,74 @@ var app = (function (app , $) {
     function initializeCache() {
         console.log('cache');
         $cache.document = $(document);
-        $cache.formSubmit = $cache.document.find('.js_form_file__submit');
-        $cache.formSubmit = $cache.document.find('.js_form_file__upload');
+        $cache.formSubmit = $cache.document.find('.form_file_submit');
+        $cache.formUpload = $cache.document.find('.form-file-wrapper');
+        $cache.progressWrapper = $cache.document.find('.js_file_progress_bar');
+        $cache.errorModal = $cache.document.find('.js_toggle_error_modal');
+        $cache.progressBar = $('#js_progress_percentage');
+        $cache.fileUploaded = $cache.document.find('.js_file_uploaded')
     }
 
     function initializeEvents() {
         console.log('events');
         $cache.document.on('click','.js_form_file__upload',triggerFileUpload);
         $cache.document.on('click','.js_form_file__submit',triggerFormSubmit);
+        $cache.document.on('change','.form-file-wrapper',fileUploaded);
+    }
+
+    function startUpload() {
+        $cache.progressWrapper.show();
+        $cache.progressBar.attr('data-progress',75);
+        $cache.progressBar.css('width','75%');
+        if (!validateFile()) {
+            clearProgress();
+        }
+    }
+
+    function fileUploaded(e) {
+        $cache.progressBar.attr('data-progress',100);
+        $cache.progressBar.css('width','100%');
+        $cache.progressWrapper.hide();
+        $cache.fileUploaded.show();
+        if ( !validateFile() ) {
+            clearProgress();
+            $cache.errorModal.trigger('click');
+        }
+    }
+
+    function clearProgress() {
+        $cache.progressWrapper.hide();
+        $cache.fileUploaded.hide();
+    }
+
+    function validateFile() {
+        var $file = document.getElementById('csv_form_file').files[0];
+
+        if(!$file) {
+            return false;
+        }
+
+        if($file && $file.type !== 'text/csv') {
+            document.getElementById('csv_form_file').value ="";
+            return false;
+        }
+
+        return true;
     }
 
     function triggerFormSubmit(e) {
         e.preventDefault();
-        var $file = document.getElementById('csv_form_file').files[0];
-        if($file){
-            $cache.document.find('.form_file_submit').trigger('click');
-        } else {
-            $cache.document.find('.js_toggle_error_modal').trigger('click');
-        }
+        if (validateFile()){
 
+            $cache.formSubmit.trigger('click');
+        } else {
+            $cache.errorModal.trigger('click');
+        }
     }
     function triggerFileUpload(e) {
-        $cache.document.find('.form-file-wrapper').trigger('click');
+        document.getElementById('csv_form_file').value ="";
+        $cache.formUpload.trigger('click');
+        startUpload();
     }
 
     app.components = app.components || {};

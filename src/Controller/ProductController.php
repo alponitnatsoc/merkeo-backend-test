@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\BundleProduct;
 use App\Entity\Product;
 use App\Form\CSVFormType;
 use Doctrine\Common\Persistence\ObjectManager;
@@ -28,10 +29,115 @@ class ProductController extends AbstractController
         $form->handleRequest($request);
 
 
-        return $this->render('product/index.html.twig', [
+        return $this->render('product/product_show.html.twig', [
             'products' => $products,
             'form'=> $form->createView(),
         ]);
+    }
+
+    /**
+     * @Route("/product/test", name="product_test")
+     */
+    public function test()
+    {
+        $em = $this->getManager();
+
+        $product = new Product();
+        $product->setReference('ADD001');
+        $product->setName('Tenis Adidas Blancos');
+        $product->setPrice(39.9);
+        $product->setCost(20.10);
+        $product->setInventory(80);
+        $product->setStatus(1);
+        $em->persist($product);
+        $em->flush();
+
+        $product = new Product();
+        $product->setReference('ADD002');
+        $product->setName('Tenis Adidas Negros');
+        $product->setPrice(42.9);
+        $product->setCost(20.10);
+        $product->setInventory(75);
+        $product->setStatus(1);
+        $em->persist($product);
+        $em->flush();
+
+        $product = new Product();
+        $product->setReference('ADD003');
+        $product->setName('Tenis Adidas Azules');
+        $product->setPrice(41.9);
+        $product->setCost(20.10);
+        $product->setInventory(70);
+        $product->setStatus(1);
+        $em->persist($product);
+        $em->flush();
+
+        $product = new Product();
+        $product->setReference('NIK001');
+        $product->setName('Tenis Nike Negros');
+        $product->setPrice(35.9);
+        $product->setCost(16.9);
+        $product->setInventory(100);
+        $product->setStatus(1);
+        $em->persist($product);
+        $em->flush();
+
+        $product = new Product();
+        $product->setReference('NIK002');
+        $product->setName('Tenis Nike Blancos');
+        $product->setPrice(32.9);
+        $product->setCost(16.9);
+        $product->setInventory(65);
+        $product->setStatus(1);
+        $em->persist($product);
+        $em->flush();
+
+
+        $product = new BundleProduct();
+        $product->setReference('ADD010');
+        $product->setName('Bundle Adidas B & N');
+        $product->setInventory(80);
+        $product->setStatus(1);
+        $em->persist($product);
+        $em->flush();
+        $product1 = $em->getRepository('App:Product')->find(1);
+        $product2 = $em->getRepository('App:Product')->find(2);
+        $product->addProduct($product1);
+        $product->addProduct($product2);
+        $em->persist($product);
+        $em->flush();
+
+        $product = new BundleProduct();
+        $product->setReference('NIK010');
+        $product->setName('Bundle Nike B & N');
+        $product->setInventory(90);
+        $product->setStatus(1);
+        $em->persist($product);
+        $em->flush();
+        $product1 = $em->getRepository('App:Product')->find(4);
+        $product2 = $em->getRepository('App:Product')->find(5);
+        $product->addProduct($product1);
+        $product->addProduct($product2);
+        $em->persist($product);
+        $em->flush();
+
+        $product = new BundleProduct();
+        $product->setReference('ADD011');
+        $product->setName('Bundle Adidas B, A & N');
+        $product->setInventory(80);
+        $product->setStatus(1);
+        $em->persist($product);
+        $em->flush();
+        $product1 = $em->getRepository('App:Product')->find(1);
+        $product2 = $em->getRepository('App:Product')->find(2);
+        $product3 = $em->getRepository('App:Product')->find(3);
+        $product->addProduct($product1);
+        $product->addProduct($product2);
+        $product->addProduct($product3);
+        $em->persist($product);
+        $em->flush();
+
+        return $this->redirectToRoute('product_show');
     }
 
     /**

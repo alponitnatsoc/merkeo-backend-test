@@ -8,6 +8,9 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\ProductRepository")
+ * @ORM\InheritanceType("JOINED");
+ * @ORM\DiscriminatorColumn(name="class", type="string")
+ * @ORM\DiscriminatorMap({"product" = "Product", "bundle_product"="BundleProduct"})
  */
 class Product
 {
@@ -19,45 +22,53 @@ class Product
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=255, nullable=true)
+     * @ORM\Column(type="string", length=255)
      */
-    private $name;
+    protected $name;
 
     /**
-     * @ORM\Column(type="string", length=255, nullable=true)
+     * @ORM\Column(type="string", length=255)
      */
-    private $reference;
+    protected $reference;
 
     /**
-     * @ORM\Column(type="float", nullable=true)
+     * @ORM\Column(type="float")
      */
-    private $price = 0.0;
+    protected $price = 0;
 
     /**
-     * @ORM\Column(type="float", nullable=true)
+     * @ORM\Column(type="float")
      */
-    private $cost = 0.0;
+    protected $cost = 0;
 
     /**
      * @ORM\Column(type="integer")
      */
-    private $inventory = 0;
+    protected $inventory;
 
     /**
-     * 0 - inactive
-     * 1 - active
      * @ORM\Column(type="integer")
      */
-    private $status = 0;
+    protected $status;
 
     /**
-     * @ORM\ManyToMany(targetEntity="App\Entity\ProductBundle", mappedBy="products")
+     * @ORM\ManyToMany(targetEntity="App\Entity\BundleProduct", inversedBy="products")
      */
-    private $productBundles;
+    private $bundles;
+
+    /**
+     * get Class
+     * returns the name of the class for the child entities
+     * @return string
+     */
+    public function getClass(){
+        $path = explode('\\', __CLASS__);
+        return array_pop($path);
+    }
 
     public function __construct()
     {
-        $this->productBundles = new ArrayCollection();
+        $this->bundles = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -70,7 +81,7 @@ class Product
         return $this->name;
     }
 
-    public function setName(?string $name): self
+    public function setName(string $name): self
     {
         $this->name = $name;
 
@@ -82,7 +93,7 @@ class Product
         return $this->reference;
     }
 
-    public function setReference(?string $reference): self
+    public function setReference(string $reference): self
     {
         $this->reference = $reference;
 
@@ -94,7 +105,7 @@ class Product
         return $this->price;
     }
 
-    public function setPrice(?float $price): self
+    public function setPrice(float $price): self
     {
         $this->price = $price;
 
@@ -106,7 +117,7 @@ class Product
         return $this->cost;
     }
 
-    public function setCost(?float $cost): self
+    public function setCost(float $cost): self
     {
         $this->cost = $cost;
 
@@ -138,48 +149,29 @@ class Product
     }
 
     /**
-     * @return Collection|ProductBundle[]
+     * @return Collection|BundleProduct[]
      */
-    public function getProductBundles(): Collection
+    public function getBundles(): Collection
     {
-        return $this->productBundles;
+        return $this->bundles;
     }
 
-    public function addProductBundle(ProductBundle $productBundle): self
+    public function addBundle(BundleProduct $bundle): self
     {
-        if (!$this->productBundles->contains($productBundle)) {
-            $this->productBundles[] = $productBundle;
-            $productBundle->addProduct($this);
+        if (!$this->bundles->contains($bundle)) {
+            $this->bundles[] = $bundle;
         }
 
         return $this;
     }
 
-    public function removeProductBundle(ProductBundle $productBundle): self
+    public function removeBundle(BundleProduct $bundle): self
     {
-        if ($this->productBundles->contains($productBundle)) {
-            $this->productBundles->removeElement($productBundle);
-            $productBundle->removeProduct($this);
+        if ($this->bundles->contains($bundle)) {
+            $this->bundles->removeElement($bundle);
         }
 
         return $this;
     }
 
-    /**
-     * @param int $units to increase or decrease inventory
-     * increases the inventory amount in the units passed as parameter, if the units are negative inventory is decreased to a max of 0
-     * @return Product
-     */
-    public function addInventory(int $units) : self
-    {
-        $inventory = $this->inventory+$units >= 0 ? $this->inventory+$units : 0;
-        $this->setInventory($inventory);
-        return $this;
-    }
-
-    public function activateProduct() : self
-    {
-        $this->setStatus(1);
-        return $this;
-    }
 }

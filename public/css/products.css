@@ -8,3 +8,8 @@
 .form_file_submit {display: none}
 .form-file-wrapper {display: none}
 .js_toggle_error_modal {display: none}
+.progress_bar {display: none; width: 35%;background-color: #827d7d; margin: 10px 0}
+.progress_bar .progress {width: 0%; background: #a1bbad}
+.js_file_uploaded {display: none; margin: 10px 0; color: #718C00}
+.bundle-header {display: inline-flex}
+.back_btn {margin: auto}
