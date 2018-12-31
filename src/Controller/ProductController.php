@@ -5,11 +5,17 @@ namespace App\Controller;
 use App\Entity\BundleProduct;
 use App\Entity\Product;
 use App\Form\CSVFormType;
+use function Couchbase\defaultDecoder;
 use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Config\Definition\Exception\Exception;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Teapot\StatusCode;
 
 class ProductController extends AbstractController
 {
@@ -20,19 +26,112 @@ class ProductController extends AbstractController
     {
         $em = $this->getManager();
         $products = $em->getRepository("App:Product")->findAll();
-        $form = $this->createForm(CSVFormType::class);
+        $form = $this->createForm(CSVFormType::class,null);
         $form->add('submit',SubmitType::class, array(
             'attr' => array('class'=>'form_file_submit'),
             'label' => 'form.file.button',
-            'translation_domain' => 'messages'
+            'translation_domain' => 'messages',
         ));
-        $form->handleRequest($request);
-
 
         return $this->render('product/product_show.html.twig', [
             'products' => $products,
             'form'=> $form->createView(),
         ]);
+    }
+
+    /**
+     * @Route("/product/execute", methods={"POST"}, name="product_execute" )
+     * @param Request $request
+     * @return Response
+     */
+    public function handleCommands(Request $request)
+    {
+        $response = new Response();
+        $response->headers->set('Content-Type','application/json');
+        $contentType = $request->getContentType();
+        $data = [];
+        if($contentType != 'json' and $contentType != 'application/json'){
+            $data['error'] = 'Error en el formato del request.<br/>';
+            $response->setContent(json_encode($data));
+            $response->setStatusCode(StatusCode::BAD_REQUEST);
+            return $response;
+        }
+        try {
+            $content = json_decode($request->getContent(),true);
+            $data['response'] = "";
+            foreach ($content as $action){
+                $line = $action['line'];
+
+                if (count($action) == 1) {
+                    $data['response'] .= 'Error en el comando ' . $line . ' el comando no es es valido.<br/>';
+                    continue;
+                }
+
+                $productID = $action['product-id'];
+                $command = $action['command'];
+
+                if (count($action) == 4) {
+                    $amount = $action['amount'];
+                }
+
+                $em = $this->getManager();
+                /** @var Product $product */
+                $product = $em->getRepository("App:Product")->find($productID);
+
+                if (empty($product)) {
+                    $data['response'] .= 'Error en el comando ' . $line . ' el producto con id ' . $productID . ' no se encontro.<br/>';
+                    continue;
+                }
+
+                if(($command == 'agregar' or $command == 'restar') and !isset($amount)) {
+                    $data['response'] .= 'Error en el comando ' . $line . ' el inventario no es valido.<br/>';
+                    continue;
+                }
+
+                switch ($command){
+                    case 'activar':
+                        $product->activateProduct();
+                        $data['response'] .= 'Comando ' . $line . ' se activo correctamente el producto con id ' . $productID . '.<br/>';
+                        break;
+                    case 'desactivar':
+                        $product->disableProduct();
+                        $data['response'] .= 'Comando ' . $line . ' se desactivo correctamente el producto con id ' . $productID . '.<br/>';
+                        break;
+                    case 'agregar':
+                        try{
+                            $product->addInventory(floor($amount));
+                            $data['response'] .= 'Comando ' . $line . ' se agrego el inventario del producto con id ' . $productID . '.<br/>';
+                        }catch(\Exception $e){
+                            $data['response'] .= 'Error en el comando ' . $line . ' no se pudo agregar el inventario.<br/>';
+                            continue;
+                        }
+                        break;
+                    case 'restar':
+                        try{
+                            $product->addInventory(floor($amount)*-1);
+                            $data['response'] .= 'Comando ' . $line . ' se redujo el inventario del producto con id ' . $productID . '.<br/>';
+                        }catch(\Exception $e){
+                            $data['response'] .= 'Error en el comando ' . $line . ' no se pudo reducir el inventario.<br/>';
+                            continue;
+                        }
+                        break;
+                    default:
+                        $data['response'] .= 'Error en el comando ' . $line . ' el comando no es valido.<br/>';
+                        continue;
+                }
+                $em->persist($product);
+                $em->flush();
+            }
+        } catch (\Exception $e){
+            $data['error'] = 'Error al ejecutar comandos. -- ['.$e->getMessage().']';
+            $response->setContent(json_encode($data));
+            $response->setStatusCode(StatusCode::INTERNAL_SERVER_ERROR);
+        }
+
+        $response->setContent(json_encode($data));
+        $response->setStatusCode(StatusCode::OK);
+
+        return $response;
     }
 
     /**
@@ -140,19 +239,7 @@ class ProductController extends AbstractController
         return $this->redirectToRoute('product_show');
     }
 
-    /**
-     * @param $productId
-     * @param $units
-     * add or decrease inventory units in the amount passed as parameter, if the amount is not an integer is rounded to the nearest integer
-     */
-    public function addInventory($productId,$units) {
-        /** @var ObjectManager $em */
-        $em = $this->getManager();
-        $product = $em->getRepository('App:Product')->find($productId);
-        $product->addInventory(round($units));
-        $em->persist($product);
-        $em->flush();
-    }
+
 
     /**
      * @return ObjectManager

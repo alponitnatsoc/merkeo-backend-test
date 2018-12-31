@@ -174,4 +174,28 @@ class Product
         return $this;
     }
 
+    /**
+     * @param int $units to increase or decrease inventory
+     * increases the inventory amount in the units passed as parameter, if the units are negative inventory is decreased to a max of 0
+     * @return Product
+     */
+    public function addInventory(int $units) : self
+    {
+        $inventory = $this->inventory+$units >= 0 ? $this->inventory+$units : 0;
+        $this->setInventory($inventory);
+        return $this;
+    }
+
+    public function activateProduct() : self
+    {
+        $this->setStatus(1);
+        return $this;
+    }
+
+    public function disableProduct() : self
+    {
+        $this->setStatus(0);
+        return $this;
+    }
+
 }

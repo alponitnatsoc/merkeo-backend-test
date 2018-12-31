@@ -44,7 +44,7 @@
             </tbody>
         </table>
     </div>
-    <div class="form-wrapper">
+    <div class="form-wrapper" data-action="{{ path('product_show') }}">
         {{ form_start(form) }}
         {{ form_row(form.file) }}
         {{ form_row(form.submit) }}
@@ -54,6 +54,8 @@
         <div class="btn btn-primary csv-file-form-upload js_form_file__upload">{{ 'upload'|trans }}</div>
         <div class="btn btn-primary csv-file-form-submit js_form_file__submit">{{ 'form.file.button'|trans }}</div>
     </div>
+    <code class="js-response-log">
+    </code>
     <div class="modal" id="file_error_modal" tabindex="-1" role="dialog">
         <div class="modal-dialog error-dialog" role="document">
             <div class="modal-content">
@@ -74,6 +76,7 @@
     </div>
     <button type="button" class="js_toggle_error_modal" data-toggle="modal" data-target="#file_error_modal">
     </button>
+    <input class="js_execute_commands_url" type="hidden" value="{{ path('product_execute') }}">
     {% block javascripts %}
         {{ parent() }}
         <script src="{{ asset('js/product_show.js') }}"></script>

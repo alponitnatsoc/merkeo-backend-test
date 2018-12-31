@@ -8,24 +8,26 @@ if (!window.jQuery) {
 var app = (function (app , $) {
     var $cache = {};
     function initializeCache() {
-        console.log('cache');
         $cache.document = $(document);
         $cache.formSubmit = $cache.document.find('.form_file_submit');
         $cache.formUpload = $cache.document.find('.form-file-wrapper');
         $cache.progressWrapper = $cache.document.find('.js_file_progress_bar');
         $cache.errorModal = $cache.document.find('.js_toggle_error_modal');
+        $cache.formActionUrl = $cache.document.find('.form-wrapper').attr('data-action');
         $cache.progressBar = $('#js_progress_percentage');
-        $cache.fileUploaded = $cache.document.find('.js_file_uploaded')
+        $cache.comandLog =  $cache.document.find('.js-response-log');
+        $cache.fileUploaded = $cache.document.find('.js_file_uploaded');
+        $cache.executeUrl = $cache.document.find('.js_execute_commands_url').val();
     }
 
     function initializeEvents() {
-        console.log('events');
         $cache.document.on('click','.js_form_file__upload',triggerFileUpload);
         $cache.document.on('click','.js_form_file__submit',triggerFormSubmit);
         $cache.document.on('change','.form-file-wrapper',fileUploaded);
     }
 
     function startUpload() {
+        $cache.comandLog.html('');
         $cache.progressWrapper.show();
         $cache.progressBar.attr('data-progress',75);
         $cache.progressBar.css('width','75%');
@@ -65,11 +67,63 @@ var app = (function (app , $) {
         return true;
     }
 
+    function readFile(){
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            var lines = e.target.result.split("\n");
+            var buffer = 20;
+            var times = Math.floor(lines.length / buffer);
+            var residue = lines.length % buffer;
+
+            for (var i = 0; (residue > 0 && i < (times+1)) || (residue <= 0 && (i<times));i++){
+                var data = {}, idx = 0;
+                for (var j = i*buffer; j < (buffer*(i+1)) && j < lines.length; j++){
+                    var values = lines[j].split(",");
+                    switch (values.length) {
+                        case 2:
+                            data[idx] = {"product-id":values[0],"command":values[1].toLowerCase(),"line":(j+1)};
+                            break;
+                        case 3:
+                            data[idx] = {"product-id":values[0],"command":values[1].toLowerCase(),"amount":values[2],"line":(j+1)};
+                            break;
+                        default:
+                            data[idx] = {"line":(j+1)};
+                            break;
+                    }
+                    idx++;
+                }
+                jQuery.ajax({
+                    type: "POST",
+                    url: $cache.executeUrl,
+                    contentType: "application/json",
+                    data: JSON.stringify(data),
+                    success: function(data){
+                        $cache.comandLog.append(data.response);
+                        refreshTable();
+                    }
+                });
+            }
+
+        };
+
+        reader.readAsText(document.getElementById('csv_form_file').files.item(0));
+    }
+
+    function refreshTable(){
+        jQuery.ajax({
+            url: $cache.formActionUrl,
+            success: function(data,response){
+                var result = $('<div />').append(data).find('.Products-wrapper').html();
+                $cache.document.find('.Products-wrapper').html(result);
+            }
+        })
+    }
+
     function triggerFormSubmit(e) {
         e.preventDefault();
         if (validateFile()){
-
-            $cache.formSubmit.trigger('click');
+            readFile();
+            // $cache.formSubmit.trigger('click');
         } else {
             $cache.errorModal.trigger('click');
         }

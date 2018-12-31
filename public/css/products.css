@@ -13,3 +13,4 @@
 .js_file_uploaded {display: none; margin: 10px 0; color: #718C00}
 .bundle-header {display: inline-flex}
 .back_btn {margin: auto}
+.js-response-log {font-family: monospace;margin: 4rem auto;display: block;height: 235px;overflow: scroll;background-color: #dee5ea85;color: gray;max-width: 900px }
