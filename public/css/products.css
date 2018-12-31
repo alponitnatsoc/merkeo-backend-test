@@ -1,4 +1,4 @@
-.Products-wrapper { margin: 1rem auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
+.Products-wrapper { margin: 1rem auto; max-width: 1000px; width: 95%; font: 18px/1.5 sans-serif; }
 .form-wrapper { margin: 4rem auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
 .Products-wrapper code { background: #F5F5F5; padding: 2px 6px; }
 .csv-file-form-upload {background-color: #868686; border-color: #313131; text-transform: uppercase}
@@ -13,4 +13,4 @@
 .js_file_uploaded {display: none; margin: 10px 0; color: #718C00}
 .bundle-header {display: inline-flex}
 .back_btn {margin: auto}
-.js-response-log {font-family: monospace;margin: 4rem auto;display: block;height: 235px;overflow: scroll;background-color: #dee5ea85;color: gray;max-width: 900px }
+.js-response-log {font-family: monospace;margin: 4rem auto;display: block;height: 235px;overflow: scroll;background-color: #dee5ea85;color: gray;max-width: 1000px }
